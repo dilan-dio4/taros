@@ -1,10 +1,11 @@
-.deck {
+.canvas {
     position: absolute;
-    width: 300px;
-    height: 200px;
+    inset: 0;
+}
+
+.card-container {
+    /* 0,0 coordinate to center of screen for easy spring animation */
+    position: absolute;
     will-change: transform;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     touch-action: none;
 }
