@@ -4,12 +4,12 @@ import { useDrag } from '@use-gesture/react'
 import styles from "./styles.module.css"
 import { TarotCard, cardHeight, cardWidth } from '../../components/TarotCard'
 import { shuffle, random } from 'lodash-es';
+import clsx from 'clsx'
 
 const cardsImgs = [
     'https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_06_Lovers.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/RWS_Tarot_02_High_Priestess.jpg/690px-RWS_Tarot_02_High_Priestess.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg',
 ]
@@ -149,10 +149,9 @@ export function Eg() {
     })
 
     return (
-        <div className={styles.canvas}>
+        <div className={clsx(styles.canvas)}>
             {props.map(({ x, y, rot, scale, angle, flip, }, i) => (
-                <animated.div className={styles["card-container"]} key={i} style={{ x, y }}>
-                    {/* This is the card itself, we're binding our gesture to it (and inject its index so we know which is which) */}
+                <animated.div className={clsx(styles["card-container"], highlightedCard === i && "z-20")} key={i} style={{ x, y }}>
                     <TarotCard
                         as={animated.div}
                         {...bind(i)}
@@ -163,6 +162,12 @@ export function Eg() {
                     />
                 </animated.div>
             ))}
+            <div
+                className={clsx(
+                    "absolute inset-0 bg-black/70 pointer-events-none opacity-0 transition-opacity duration-150",
+                    highlightedCard !== undefined && "opacity-100"
+                )}
+            />
         </div>
     )
 
