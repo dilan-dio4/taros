@@ -8,7 +8,9 @@
     "open:android": "npx cap open android",
     "open:ios": "npx cap open ios",
     "run:android": "tsc && vite build && npx cap run android",
-    "run:ios": "tsc && vite build && npx cap run ios"
+    "run:ios": "tsc && vite build && npx cap run ios",
+    "sync:android": "tsc && vite build && npx cap sync android",
+    "sync:ios": "tsc && vite build && npx cap sync ios"
   },
   "dependencies": {
     "@capacitor/core": "^5.5.0",
@@ -19,8 +21,14 @@
     "@capacitor/splash-screen": "^5.0.6",
     "@react-spring/web": "^9.7.3",
     "@use-gesture/react": "^10.3.0",
+    "clsx": "^2.0.0",
+    "dayjs": "^1.11.10",
+    "lodash-es": "^4.17.21",
+    "nanoid": "^5.0.2",
+    "navigo": "^8.11.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.1",
