@@ -1,9 +1,10 @@
 .card {
     touch-action: none;
-    box-shadow: 0 12.5px 100px -10px rgba(50, 50, 73, 0.4), 0 10px 10px -10px rgba(50, 50, 73, 0.3);
     position: relative;
     transform-style: preserve-3d;
     border-radius: 10px;
+    will-change: box-shadow, transform;
+    transition: box-shadow 0.5s ease;
 }
 
 .card > div {
@@ -13,6 +14,7 @@
     backface-visibility: hidden;
     background-color: #EEE;
 }
+
 .card > div:first-of-type {
     transform: rotateY(180deg);
 }

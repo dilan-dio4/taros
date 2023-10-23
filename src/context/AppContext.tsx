@@ -15,6 +15,9 @@ export default function AppProvider({
     const [router] = useState(() => {
         const _router = new Navigo("/")
         _router.on({
+            "/": () => {
+                setActiveView(undefined)
+            },
             "/home": () => {
                 setActiveView("home")
             },

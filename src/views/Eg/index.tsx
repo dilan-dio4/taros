@@ -3,8 +3,9 @@ import { useSprings, animated, to as interpolate } from '@react-spring/web'
 import { useDrag } from '@use-gesture/react'
 import styles from "./styles.module.css"
 import { TarotCard, cardHeight, cardWidth } from '../../components/TarotCard'
-import { shuffle, random } from 'lodash-es';
+import { shuffle, random, clamp } from 'lodash-es';
 import clsx from 'clsx'
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 const cardsImgs = [
     'https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg',
@@ -29,6 +30,9 @@ const inDeckPosition = (i: number) => ({
 // This is being used down there in the view, it interpolates rotation and scale into a css transform
 const trans = (r: number, a: number, f: number, s: number) =>
     `perspective(1500px) rotateX(${a}deg) rotateY(${f || r / 10}deg) rotateZ(${r}deg) scale(${s})`
+
+const flipTrans = (f: number) =>
+    `rotateY(${f}deg)`
 
 type Card = {
     value: number;
@@ -61,9 +65,11 @@ export function Eg() {
                 if (triggerHighlight) {
                     cards.current[index].state = "highlighted"
                     setHighlightedCard(index)
+                    Haptics.impact({ style: ImpactStyle.Medium })
                 } else if (triggerDiscard) {
                     // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
                     cards.current[index].state = "discarded"
+                    Haptics.impact({ style: ImpactStyle.Light })
                 }
             } else if (cards.current[index].state === "highlighted") {
                 const triggerFlip = xVel > 0.2;
@@ -73,6 +79,7 @@ export function Eg() {
                 } else if (triggerDeck) {
                     setHighlightedCard(undefined)
                     cards.current[index].state = "inDeck"
+                    Haptics.impact({ style: ImpactStyle.Medium })
                 }
             } else if (cards.current[index].state === "highlighted-flipped") {
                 const triggerPlay = yVel > 0.2 && yDir < 0;
@@ -86,6 +93,7 @@ export function Eg() {
                 } else if (triggerDeck) {
                     setHighlightedCard(undefined)
                     cards.current[index].state = "inDeck"
+                    Haptics.impact({ style: ImpactStyle.Medium })
                 }
             }
         }
@@ -111,8 +119,8 @@ export function Eg() {
                 const scaleSize = 1.5
                 return {
                     to: {
-                        x: startPos.x,
-                        y: startPos.y - (cardHeight * scaleSize) / 2,
+                        x: startPos.x + (down ? clamp(mx, -20, 20) : 0),
+                        y: startPos.y - ((cardHeight * scaleSize) / 2) + (down ? clamp(my, -20, 20) : 0),
                         scale: scaleSize,
                         rot: 0,
                         angle: 0,
@@ -120,7 +128,14 @@ export function Eg() {
                     }
                 }
             } else if (cardState === "highlighted-flipped") {
+                const startPos = inDeckPosition(i)
+                const scaleSize = 1.5
                 return {
+                    x: startPos.x + (down ? clamp(mx, -20, 20) : 0),
+                    y: startPos.y - ((cardHeight * scaleSize) / 2) + (down ? clamp(my, -20, 20) : 0),
+                    scale: scaleSize,
+                    rot: 0,
+                    angle: 0,
                     flip: 180,
                 }
             } else {
@@ -151,12 +166,21 @@ export function Eg() {
     return (
         <div className={clsx(styles.canvas)}>
             {props.map(({ x, y, rot, scale, angle, flip, }, i) => (
-                <animated.div className={clsx(styles["card-container"], highlightedCard === i && "z-20")} key={i} style={{ x, y }}>
+                <animated.div
+                    className={clsx(styles["card-container"], highlightedCard === i && "z-20")}
+                    key={i}
+                    style={{
+                        x,
+                        y,
+                        transform: interpolate([rot, angle, flip, scale], trans),
+                    }}
+                >
                     <TarotCard
                         as={animated.div}
+                        glowColor={highlightedCard === i ? "#ff1493" : undefined}
                         {...bind(i)}
                         style={{
-                            transform: interpolate([rot, angle, flip, scale], trans),
+                            transform: interpolate([flip], flipTrans),
                         }}
                         backgroundUrl={cards.current[i].backgroundUrl}
                     />
